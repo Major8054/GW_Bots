@@ -8,44 +8,9 @@
 #include <Array.au3>
 #include <GuiComboBox.au3>
 
-
-; vers ligne 590 : modification
-;retrait salvage car marche pas
-
-
-;;;; problems fixed ;;;;
-
-; * do not work :
-;TargetNearestAlly()
-
-; * need test :
-;Resign
-
-; * functions in Dependency.au3 :
-;GetSkillPtr()
-;MemoryReadAgentPtrStruct()
-;GetBagPtr()
-;GetItemPtr()
-;GetNumberOfFoesInRangeOfAgent (MemoryReadAgentPtrStruct...)
-;CountSlots(GetBagPtr...)
-;GetItemPtrByAgentID(GetItemPtr...)
-;UpdateAgentPosByPtr(MemoryReadStruct())
-;PickUpItems(Move_())
-;GetPlayerPtrByPlayerNumber(MemoryReadAgentPtrStruct...)
-;GetMerchant()
-;GetItemPtrBySlot(GetBagPtr...)
-;GetIsUnided(GetItemPtr...)
-;CountSlotsChest(GetBagPtr...)
-;SendSafePacket()
-;Prepare()
-; ??????????
-;OpenStorageSlot()
-;;;;;;;;;;;;;;;;;;
-
 ; UI const
 Global Const $ss_center = 1
-;Global Const $cbs_dropdown = 2
-;Global Const $cbs_autohscroll = 64
+
 Global $mfirstchar = ""
 Global Const $bs_vcenter = 3072
 Global Const $gui_event_close = -3
@@ -78,9 +43,7 @@ Local $Rendering = True
 	Local Const $skill_winnowing = [8, 5, 463]
 #EndRegion
 #Region Variables
-	;Global $xs_n
-	;Local $dyetosell
-	Local $nbRuns = 0
+    Local $nbRuns = 0
 	Local $nbFails = 0
 	Local $running = False
 	Local $initialized = False
@@ -156,23 +119,14 @@ $resignReady = False
 	;initpacket()
 	While 1
 		If $running Then
-			;ManageInventory() edit 2020
-			;If GetMapID() <> $mapid_anjeka & GetMapID() <> $mapid_drazach Then ; test
 			If GetMapID() <> $mapid_anjeka Then
-				;If GetMapID() == 195 Then
-				 ;  resign()
-				 ;  ReturnToOutpost()
-			    ;Else
-				 Out("Travel to Anjeka")
+			     Out("Travel to Anjeka")
 			     TravelTo($mapid_anjeka)
 
-				;SwitchMode(1)
-			    ; $resignReady = False
-			  ;  EndIf
+
 				 WaitMapLoading($mapid_anjeka, 45000)
-				 ;Sleep(3000); test
 			 EndIf
-			 ManageInventory(); edit 2020
+			 ManageInventory()
 			If Not $resignReady Then
 			   SwitchMode(1)
 			   ;GetResignReady() ; no need because resign is not working
@@ -193,9 +147,8 @@ $resignReady = False
 			   _TravelGH()
 			   Out("Bot paused")
 			   $resignReady = False
-			   ;Spam_Event(); test
 			Endif
-			; If Mod($nbRuns, 20) = 0 AND Not $Rendering Then _purgehook()
+
 		EndIf
 		Sleep(250)
 	WEnd
@@ -259,30 +212,19 @@ Func DoJob()
     If Not $Rendering Then Clearmemory()
 	Local $ldeadlock
 	Local $lReturnTarget
-	;UseSpeedBoost()
 	Out("Going outside")
 	Move(-11209, -23100)
-	;Out("move")
 	WaitMapLoading($mapid_drazach, 45000)
-	;Out("WaitMapLoading($mapid_drazach)")
 	If Not $Rendering Then Clearmemory(); test
 	If GetMapID() <> $mapid_drazach Then Return False
-	;TargetNearestAlly()
-	; Target
-	;$lReturnTarget = GetNearestAgentToCoords(-7891, 18376)
 	$lReturnTarget = GetNearestAgentToCoords(-8361, 18604)
 	Sleep(50)
 	UseSkill(2, -2)
 	Sleep(50)
 	UseSkill(1, $lReturnTarget); Return
 	Sleep(3000)
-	;_UseSkillex(1, $lReturnTarget, 8000); Return
 	MoveTo(-7924, 18281)
-	;UseSkill($skill_serpent[0], $myptr)
-	;_UseSkillex(3); Shadow Form
-	;_UseSkillex(4); Shroud
 
-	;UseSkill(3); Shadow Form
 	_UseSkillex(3);SF ADD
 	Sleep(1000)
 	;UseSkill(4); Shroud
@@ -301,7 +243,7 @@ Func DoJob()
 	UseSkill(6, $myptr); SoH
 	MoveTo(-6604, 18585, 5)
 	_UseSkillex(8); Winnowing
-	While GetIsCasting(0);While GetIsCasting()
+	While GetIsCasting(0)
 		Sleep(250)
 	WEnd
 	Do
@@ -356,28 +298,6 @@ EndFunc
 #EndRegion
 #Region PickUp
 
-	;Func _PickupLoot($aminslots = 2)
-	;	Local $lmex, $lmey, $lagentx, $lagenty
-	;	Local $lslots = CountSlots()
-	;	Local $lAgentArray = MemoryReadAgentPtrStruct(1, 1024)
-	;	For $i = 1 To $lAgentArray[0]
-	;		If GetIsDead($myptr) Then Return False
-	;		$lagentid = MemoryRead($lAgentArray[$i] + 44, "long")
-	;		$litemptr = GetItemPtrByAgentID($lagentid)
-	;		If $litemptr = 0 Then ContinueLoop
-	;		$litemtype = MemoryRead($litemptr + 32, "byte")
-	;		If $lslots < $aminslots Then
-	;			If $litemtype <> 11 AND $litemtype <> 20 Then ContinueLoop
-	;		EndIf
-	;		If Not CanPickup($litemptr) Then ContinueLoop
-	;		UpdateAgentPosByPtr($myptr, $lmex, $lmey)
-	;		UpdateAgentPosByPtr($lAgentArray[$i], $lagentx, $lagenty)
-	;		$ldistance = Sqrt(($lmex - $lagentx) ^ 2 + ($lmey - $lagenty) ^ 2)
-	;		If $ldistance > 2000 Then ContinueLoop
-	;		PickUpItems($lAgentArray[$i], $lagentid, $lagentx, $lagenty, $ldistance, $myptr)
-	;	Next
-	;EndFunc
-
 	Func PickUpLoot()
 	        Local $lMe
 	        Local $lBlockedTimer
@@ -418,8 +338,6 @@ EndFunc
         	$lextraid = DllStructGetData($aitemptr, 'ExtraID')
         	$lrarity = GetRarity($aitemptr)
 
-		;Local $lmodelid = MemoryRead($aitemptr + 44, "long")
-		;Local $litemtype = MemoryRead($aitemptr + 32, "byte")
 		If $litemtype = 20 Then Return True
 		If $pickupAll Then
 			If $lmodelid = 146 Then
@@ -453,8 +371,6 @@ EndFunc
 			Case 22751
 				Return True
 			Case 146
-				;$extra = MemoryRead($litemptr + 34, "short")
-				;If $extra = 10 OR $extra = 12 Then Return True
 				If $lextraid = 10 OR $lextraid = 12 Then Return True
 			Case $modelid_amber, $modelid_echovald, $modelid_gothic, $modelid_ornate
 				If GetRarity($aitemptr) = $rarity_gold Then Return True
@@ -497,12 +413,6 @@ EndFunc
 		Out("Checking Inventory")
 		If GetGoldCharacter() > 98000 Then DepositGold()
 		If CountSlots() < 5 Then
-		;If True Then
-			;_TravelGH()
-			;$lmapid_hall = GetMapID()
-			;If Not HardCodedMerchant($lmapid_hall) Then
-			;	GoToNPC(GetPlayerPtrByPlayerNumber(GetMerchant($lmapid_hall)))
-			;EndIf
 			TravelTo(283); donjon de maatu
 			Out("Travel To Maatu")
 			UseSpeedBoost()
@@ -561,10 +471,7 @@ EndFunc
 				$litem = GetItemBySlot($lbagptr, $slot)
 				If Not GetCanSalvage($litem) Then ContinueLoop
 				Out("Salvaging : " & $bag & "," & $slot)
-				;$lquantity = MemoryRead($litem + 75, "byte")
 				$lquantity = DllStructGetData($litem, 'Quantity')
-				;$itemmid = MemoryRead($litem + 44, "long")
-				;$itemmid = DllStructGetData($aItem, "ModelId")
 				$itemrarity = GetRarity($litem)
 				If $itemrarity = $rarity_white OR $itemrarity = $rarity_blue Then
 					For $i = 1 To $lquantity
@@ -572,45 +479,25 @@ EndFunc
 							$lsalvagekitid = FindSalvageKit()
 							$lsalvagekitptr = GetItemByItemID($lsalvagekitid)
 						EndIf
-						;If MemoryRead($lsalvagekitptr + 12, "ptr") = 0 Then
-						;	SalvageKit()
-						;	;$lsalvagekitid = FindSalvageKit(1, 4)
-						;	$lsalvagekitid = FindSalvageKit()
-						;	$lsalvagekitptr = GetItemByItemID($lsalvagekitid)
-						;EndIf
-						$lquantityold = $lquantity
-						;$loldvalue = MemoryRead($lsalvagekitptr + 36, "short")
+							$lquantityold = $lquantity
 						$loldvalue = DllStructGetData($lsalvagekitptr, "Value")
-						;StartSalvage($litem, $lsalvagekitid)
 						Out("WB S")
 						StartSalvage($litem)
 						Local $ldeadlock = TimerInit()
 						Do
 							Sleep(200)
-						;Until MemoryRead($lsalvagekitptr + 36, "short") <> $loldvalue OR TimerDiff($ldeadlock) > 5000
 						Until DllStructGetData($lsalvagekitptr, "Value") <> $loldvalue OR TimerDiff($ldeadlock) > 5000
 					Next
 				ElseIf $itemrarity = $rarity_purple OR $itemrarity = $rarity_gold Then
-					;$itemtype = MemoryRead($litem + 32, "byte")
 					$itemtype = DllStructGetData($litem, "Type")
 					If $itemtype = 0 Then
 						ContinueLoop
 					EndIf
-					;If MemoryRead($litem + 12, "ptr") <> 0 Then ; ptr Bag <> 0x0 ???
-					;If MemoryRead($lsalvagekitptr + 12, "ptr") = 0 Then
 					If SalvageKit() Then
 						$lsalvagekitid = FindSalvageKit()
 						$lsalvagekitptr = GetItemByItemID($lsalvagekitid)
 					EndIf
-					;If MemoryRead($lsalvagekitptr + 12, "ptr") = 0 Then
-					;	SalvageKit()
-					;	;$lsalvagekitid = FindSalvageKit(1, 4)
-					;	$lsalvagekitid = FindSalvageKit()
-					;	$lsalvagekitptr = GetItemByItemID($lsalvagekitid)
-					;EndIf
-					;$loldvalue = MemoryRead($lsalvagekitptr + 36, "short")
 					$loldvalue = DllStructGetData($lsalvagekitptr, "Value")
-					;StartSalvage($litem, $lsalvagekitid)
 					Out("PG S")
 					StartSalvage($litem)
 					Sleep(500 + GetPing())
@@ -618,9 +505,7 @@ EndFunc
 					Local $ldeadlock = TimerInit()
 					Do
 						Sleep(200)
-					;Until MemoryRead($lsalvagekitptr + 36, "short") <> $loldvalue OR TimerDiff($ldeadlock) > 5000
 					Until DllStructGetData($lsalvagekitptr, "Value") <> $loldvalue OR TimerDiff($ldeadlock) > 5000
-					;EndIf ;litem +12 "ptr"
 				EndIf
 			Next
 		Next
@@ -704,11 +589,8 @@ EndFunc
 					;Local $lmodelid = MemoryRead($aItem + 44, "long")
 					Local $lmodelid = DllStructGetData($aItem, "ModelId")
 					Local $larr[] = [$lmodelid, getitemreq($aItem), $lmod]
-					;SendSafePacket(Prepare("drop", $larr));test retirer cette commande qui bug
 				EndIf
 			    If IsPerfectShield($aItem) Then Return False
-				;If GetRarity($aItem) = $rarity_gold And DllStructGetData($aItem, "ModStructSize") = 5 Then Return False
-				;If GetRarity($aItem) = $rarity_gold And MemoryRead($aItem + 20, "long") = 5 Then Return False
 			Case 10
 				;Switch MemoryRead($aItem + 34, "short")
 				Switch DllStructGetData($aItem, "ExtraId")
@@ -723,7 +605,7 @@ EndFunc
 				;If MemoryRead($aItem + 44, "long") = 934 Then Return False
 				If DllStructGetData($aItem, "ModelId") = 934 Then Return False
 			    ;Materials
-				If $lmodelid = 956 and $KeepSpiritwood Then Return False ; boispirite ; retiré temp
+				If $lmodelid = 956 and $KeepSpiritwood Then Return False ; boispirite
 				If $lmodelid = 930 Then Return False ; ectos
 			    If $lmodelid = 945 Then Return False ; frags
 			    If $lmodelid = 938 Then Return False ; saphirs
@@ -819,23 +701,6 @@ EndFunc
 	Func ResignToOutpost($aisdead)
 		Out("Resigning")
 		Resign(); TODO : test the function
-		;Sleep(2000) ; test
-		;TravelTo($mapid_anjeka)
-		;Do
-		;	Sleep(100)
-		;Until GetIsDead($myptr)
-		;If $aisdead Then
-		;	RndSleep(4000)
-		;Else
-		;	RndSleep(1500)
-		;EndIf
-		;Out("Return To Outpost")
-		;ReturnToOutpost();test
-		;WaitMapLoading($mapid_anjeka);test
-		;Sleep(3000);test
-		;TravelTo($mapid_anjeka)
-		;Out("WaitMapLoading($mapid_anjeka)")
-		;WaitMapLoading($mapid_anjeka)
 	EndFunc
 
 #EndRegion
@@ -855,11 +720,6 @@ Func Out($text)
 	_GUICtrlEdit_AppendText($gui_edit,@CRLF& $text)
 	_GUICtrlEdit_Scroll ($gui_edit, 1) ;1=$SB_LINEDOWN
 EndFunc
-
-	; TODO : check if used
-	; Func GetChecked($guictrl)
-	; 	Return (GUICtrlRead($guictrl) == $gui_checked)
-	; EndFunc
 
 #EndRegion GUI Functions
 
@@ -891,7 +751,7 @@ Func GetDualModShield($aitem)
 	EndIf
 	Return False
 EndFunc
-;_______________
+
 Func UseSpeedBoost()
 	$item = GetItemByModelID(21492); fruitcake
 	If DllStructGetData($item, 'Bag') <> 0 Then
@@ -908,7 +768,6 @@ EndFunc
 		MoveTo(7536, 5859)
 		Out("Go to merch")
 		Local $Trader = GetNearestNPCToCoords(-3427, -1612)
-;		$Trader = GetAgentByName("Argus[Rare Material Trader]")
 		GOTONPC($Trader)
 		TraderRequest($MAT_ECTO)
 		Out("TraderRequest($MAT_ECTO) = " & TraderRequest($MAT_ECTO))
